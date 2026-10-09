@@ -1,4 +1,4 @@
-# Avro HTTP Example
+# Avro HTTP And Async Examples
 
 This example is based on [YOU54F's Avro sample](https://github.com/YOU54F/pact-dotnet-ffi-plugins/tree/main/Avro)
 and uses the current [hominux Avro plugin](https://github.com/hominux/pact-avro-plugin).
@@ -20,14 +20,15 @@ bash scripts/test-publish.sh avro
 ```
 
 Set `PACTNET_HTTP_SOURCE_DIR` if the contribution checkout is elsewhere. The
-bootstrap builds separate `5.0.0-plugin.http.local` packages; it does not replace
+bootstrap builds separate `5.0.0-plugin.messages.1.local` packages; it does not replace
 the gRPC prerequisite packages or expose native handles to this extension.
 
-Six wrapper unit tests and three executable sample tests run. They cover a GET
+Seven wrapper unit tests and five executable sample tests run. They cover a GET
 returning a real binary Avro record, POST request/response matching, an unused
 request failure, successful provider verification, and rejection of a mismatching
-provider. The provider uses an ephemeral HTTP port and stops automatically.
-Generated pacts are under `artifacts/avro-pacts/`.
+provider, plus binary async consumption, metadata and asynchronous provider checks.
+The provider uses an ephemeral HTTP port and stops automatically. Generated pacts
+are under `artifacts/avro-pacts/` and `artifacts/avro-message-pacts/`.
 
 ## Wrapper Usage
 
@@ -55,8 +56,11 @@ The wrapper normalizes schema paths, preserves field matchers and rejects reserv
 `pact:` field keys. Native plugin version selection is optional; omit it to delegate
 selection to the framework, or pin it for repeatable CI.
 
-This is an **HTTP content-plugin** example, not an asynchronous Avro message
-consumer. It is registered with `localOnly: true` until the public HTTP API is
+For transport-free message consumption, use `WithAvroMessages` and
+`WithAvroContent`. [The messaging guide](../../docs/avro-messaging.md) shows the
+working async example and the observed synchronous limitation with plugin 0.1.3.
+
+Avro is registered with `localOnly: true` until the public HTTP/async APIs are
 available upstream; normal CI discovery excludes it. Development packages are
 not releasable. [The contribution guide](../../docs/http-plugin-contribution.md)
-describes the missing async interaction API separately.
+describes those API additions.

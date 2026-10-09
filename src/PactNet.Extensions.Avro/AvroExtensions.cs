@@ -18,6 +18,23 @@ public static class AvroExtensions
         int? port = null, IPAddress host = IPAddress.Loopback, string pluginVersion = null)
         => pact.WithHttpPluginInteractions("avro", pluginVersion, port, host);
 
+    /// <summary>Create asynchronous Avro messages without choosing a broker transport.</summary>
+    /// <param name="pact">Pact details.</param>
+    /// <param name="pluginVersion">Optional native plugin version.</param>
+    /// <returns>An asynchronous plugin builder owned by PactNet.</returns>
+    public static IAsynchronousPluginPactBuilderV4 WithAvroMessages(this IPactV4 pact, string pluginVersion = null)
+        => pact.WithAsynchronousPluginInteractions("avro", pluginVersion);
+
+    /// <summary>Configure an Avro message and move to binary consumer verification.</summary>
+    /// <param name="message">Asynchronous plugin message builder.</param>
+    /// <param name="schemaPath">Path to an Avro schema file.</param>
+    /// <param name="recordName">Record name within that schema.</param>
+    /// <param name="fields">Record field values or plugin matching expressions.</param>
+    /// <returns>A verifier that passes binary contents and metadata to the real consumer.</returns>
+    public static IConfiguredPluginMessageVerifier WithAvroContent(this IAsynchronousPluginMessageBuilderV4 message,
+        string schemaPath, string recordName, IDictionary<string, object> fields)
+        => message.WithContent("avro/binary", Contents(schemaPath, recordName, fields));
+
     /// <summary>Configure an Avro request body.</summary>
     /// <param name="request">HTTP plugin request builder.</param>
     /// <param name="schemaPath">Path to an Avro schema file.</param>

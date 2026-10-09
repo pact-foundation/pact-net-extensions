@@ -18,7 +18,7 @@ in order, then creates the wrapper's `.nupkg` and `.snupkg`. The provider fixtur
 uses port 5000, which must be free. Plugins, generated pacts, bootstrap packages,
 and other development output stay under ignored `artifacts/`.
 
-## Avro HTTP Prototype
+## Avro HTTP And Async Prototype
 
 The Avro wrapper uses the PactNet plugin API described in
 [the contribution guide](http-plugin-contribution.md). The bootstrap clones the
@@ -33,11 +33,14 @@ bash scripts/release.sh pack-local avro
 bash scripts/test-publish.sh avro
 ```
 
-Set `PACTNET_HTTP_SOURCE_DIR` for another local source path. This runs six wrapper
-tests and three native HTTP sample tests, packages Avro independently, and verifies
-local NuGet publication. The HTTP provider uses an ephemeral port. Standard CI
-discovery includes both gRPC and Avro; the Avro package itself remains unreleasable
-until its PactNet API dependency is published.
+Set `PACTNET_HTTP_SOURCE_DIR` for another local source path. This runs seven
+wrapper tests and five native HTTP/async sample tests, packages Avro independently,
+and verifies local NuGet publication. The HTTP provider uses an ephemeral port.
+Standard CI discovery includes both gRPC and Avro; the Avro package itself remains
+unreleasable until its PactNet API dependency is published.
+
+[Avro messaging](avro-messaging.md) describes the async consumer/provider example,
+the native synchronous capability probe, and the remaining sync contributions.
 
 ## CI With Act
 

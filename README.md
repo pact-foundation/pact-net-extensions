@@ -2,7 +2,7 @@
 
 Independently versioned .NET wrappers for the [Pact plugin framework](https://github.com/pact-foundation/pact-plugins).
 The gRPC wrapper supports unary consumer contract tests using the protobuf plugin.
-An Avro HTTP content wrapper and sample use a local PactNet API contribution.
+Avro HTTP and asynchronous message examples use a local PactNet API contribution.
 This repository contains wrappers, not plugin drivers
 or native plugins. PactNet owns mock servers, verification, logging, pact writing,
 and native resource cleanup.
@@ -81,8 +81,9 @@ exercise each request rather than relying solely on verification success.
 ## Contributing And Releases
 
 - [Developer testing](docs/developer-testing.md): native tests, act, and local NuGet publication.
-- [Avro example](samples/Avro/README.md): binary HTTP contracts with the hominux plugin.
-- [Plugin interaction contributions](docs/http-plugin-contribution.md): public HTTP hooks and the separate async-message prerequisite.
+- [Avro examples](samples/Avro/README.md): binary HTTP and asynchronous contracts with the hominux plugin.
+- [Avro messaging](docs/avro-messaging.md): async usage and synchronous capability requirements.
+- [Plugin interaction contributions](docs/http-plugin-contribution.md): public HTTP and async APIs.
 - [Wrapper-author workshop](docs/writing-a-wrapper.md): raw API, thin fluent wrapper, tests, and registration.
 - [Independent releases](docs/releases.md): package-specific versions, tags, gates, and adding wrappers.
 

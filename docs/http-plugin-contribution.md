@@ -71,7 +71,7 @@ bash scripts/test-publish.sh avro
 ```
 
 The source checkout must contain the HTTP contribution and descend from the pinned
-#551 commit. Packages use `5.0.0-plugin.http.local`, separate from the gRPC bootstrap.
+#551 commit. Packages use `5.0.0-plugin.messages.1.local`, separate from the gRPC bootstrap.
 No patch files, native driver implementation, or source copies are carried in the
 extension repository. The contribution is in PactNet itself.
 
@@ -85,25 +85,15 @@ the release guard still blocks publication while it depends on a local PactNet A
 Once the generic API is published, update `AvroPactNetVersion`, remove the prototype
 bootstrap entry, and run the full CI/publish gates before releasing `avro/v<version>`.
 
-## Asynchronous Plugin Messages
+## Message Interaction Contribution
 
-The Avro plugin's own primary example uses asynchronous messages, with transport
-abstracted away. That is another interaction type and is not implemented by this
-HTTP contribution or the synchronous plugin API.
+The same worktree now also exposes asynchronous plugin messages, single-shot
+configuration and binary/metadata consumer callbacks, keeping native reification,
+string ownership, pact writing and plugin cleanup inside PactNet. The native Avro
+example verifies both a real async consumer and a producer via a message adapter.
 
-A follow-up PactNet contribution needs:
-
-1. A public asynchronous plugin pact/message builder that loads plugins and creates
-   native asynchronous message interactions, not HTTP or synchronous messages.
-2. A single terminal contents call using each plugin's configuration schema.
-3. A consumer callback exposing generated **binary** contents plus content-type and
-   message metadata; JSON-only reification is insufficient for Avro decoding.
-4. Native message reification, matching/generation, log/error handling and cleanup
-   kept inside PactNet, with provider verification through its existing verifier.
-5. Tests for Avro byte decoding, matchers, nullable fields/defaults, provider states,
-   metadata, failed callbacks, multiple messages and plugin-resource disposal.
-
-Such a wrapper must not simulate a broker, disguise messages as HTTP interactions,
-or add a second FFI lifecycle in this repo. Use the Avro plugin's asynchronous
-consumer/provider examples to validate that contribution independently of the
-working HTTP example here.
+[The messaging guide](avro-messaging.md) describes this API and its upstream review
+gates. It also records a native synchronous capability probe: Avro 0.1.3 does not
+populate request/response parts with its single-record configuration. Sync messaging
+therefore needs plugin configuration changes and a transport-free binary consumer
+verification API, not just another wrapper method or a pretend broker transport.

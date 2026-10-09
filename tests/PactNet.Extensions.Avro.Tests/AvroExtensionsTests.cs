@@ -54,6 +54,18 @@ public class AvroExtensionsTests
     }
 
     [Fact]
+    public void AsyncMessage_MapsContentsAndReturnsTheVerifier()
+    {
+        var message = new Mock<IAsynchronousPluginMessageBuilderV4>();
+        var verifier = new Mock<IConfiguredPluginMessageVerifier>();
+        message.Setup(value => value.WithContent("avro/binary", It.Is<Dictionary<string, object>>(contents =>
+            (string)contents["pact:record-name"] == "User" && (string)contents["username"] == "alice")))
+            .Returns(verifier.Object);
+        Assert.Same(verifier.Object, message.Object.WithAvroContent("user.avsc", "User",
+            new Dictionary<string, object> { ["username"] = "alice" }));
+    }
+
+    [Fact]
     public void PluginVersion_DefaultsToFrameworkSelection()
     {
         var parameters = typeof(AvroExtensions).GetMethod(nameof(AvroExtensions.WithAvroInteractions)).GetParameters();
