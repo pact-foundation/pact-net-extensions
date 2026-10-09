@@ -5,11 +5,12 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <OutputType>Library</OutputType>
+    <Version>0.1.0-alpha.1</Version>
+    <Description>gRPC consumer contract testing with PactNet and the Pact protobuf plugin.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PactNet.Abstractions\PactNet.Abstractions.csproj" />
-    <ProjectReference Include="..\PactNet\PactNet.csproj" />
+    <PackageReference Include="PactNet" Version="$(PactNetVersion)" />
   </ItemGroup>
 
   <Import Project="../NuGet.targets" />

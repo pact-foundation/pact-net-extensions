@@ -13,8 +13,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\PactNet.Output.Xunit\PactNet.Output.Xunit.csproj" />
-    <ProjectReference Include="..\..\..\src\PactNet\PactNet.csproj" />
+    <PackageReference Include="PactNet.Output.Xunit" Version="$(PactNetVersion)" />
+    <PackageReference Include="PactNet" Version="$(PactNetVersion)" />
     <ProjectReference Include="..\GrpcGreeter\GrpcGreeter.csproj" />
   </ItemGroup>
   <ItemGroup>
