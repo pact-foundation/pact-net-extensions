@@ -52,6 +52,7 @@ internal class GrpcRequestBuilder(ISynchronousPluginRequestBuilderV4 requestBuil
     private const string RequestKey = "request";
     private const string PactContentType = "pact:content-type";
     private bool requestConfigured;
+    private bool responseStarted;
 
     internal readonly Dictionary<string, object> InteractionContents = new();
 
@@ -101,6 +102,12 @@ internal class GrpcRequestBuilder(ISynchronousPluginRequestBuilderV4 requestBuil
             throw new InvalidOperationException("You must configure the request before defining the response");
         }
 
+        if (this.responseStarted)
+        {
+            throw new InvalidOperationException("Response has already been started.");
+        }
+
+        this.responseStarted = true;
         return new GrpcResponseBuilder(requestBuilder, this.InteractionContents);
     }
 }

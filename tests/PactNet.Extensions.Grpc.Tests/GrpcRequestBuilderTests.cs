@@ -87,6 +87,16 @@ public class GrpcRequestBuilderTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
+    public void WillRespond_CalledTwice_Throws()
+    {
+        var builder = this.CreateBuilder();
+        builder.WithRequest("greet.proto", "Greeter", "SayHello", new { name = "foo" });
+        builder.WillRespond();
+
+        Assert.Throws<InvalidOperationException>(() => builder.WillRespond());
+    }
+
+    [Fact]
     public void Given_WhenCalled_AddsProviderState()
     {
         this.CreateBuilder().Given("provider state");
