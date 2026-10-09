@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>0.1.0-alpha.1</Version>
+    <Description>Avro binary HTTP contract testing with PactNet and the hominux Avro plugin.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="PactNet" Version="$(AvroPactNetVersion)" />
+  </ItemGroup>
+  <Import Project="../NuGet.targets" />
+  <PropertyGroup>
+    <Authors>Pact Foundation; Yousaf Nabi</Authors>
+    <PactNetVersion>$(AvroPactNetVersion)</PactNetVersion>
+  </PropertyGroup>
+</Project>

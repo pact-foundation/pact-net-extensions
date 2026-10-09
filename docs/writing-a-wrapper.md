@@ -89,6 +89,11 @@ proof that all such interactions ran.
 
 ## 5. Register And Document
 
+Content plugins also need an interaction type supported by the public API. See
+[the Avro HTTP example](../samples/Avro/README.md) and
+[the HTTP/async contribution guide](http-plugin-contribution.md). A synchronous
+message plugin builder is not a substitute for HTTP or asynchronous messages.
+
 Add a slug, package project, ordered test projects, optional plugin installer,
 and sample environment paths to `extensions.json`. CI discovers this registry;
 release routing selects one slug. Add package and sample READMEs documenting

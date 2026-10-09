@@ -18,6 +18,26 @@ in order, then creates the wrapper's `.nupkg` and `.snupkg`. The provider fixtur
 uses port 5000, which must be free. Plugins, generated pacts, bootstrap packages,
 and other development output stay under ignored `artifacts/`.
 
+## Avro HTTP Prototype
+
+The Avro wrapper needs the local PactNet HTTP plugin contribution described in
+[the contribution guide](http-plugin-contribution.md). With its checkout at the
+sibling `pact-net-http-plugins` path:
+
+```shell
+bash scripts/bootstrap-http-plugin.sh
+bash scripts/install-avro-plugin.sh
+bash scripts/release.sh pack-local avro
+bash scripts/test-publish.sh avro
+```
+
+Set `PACTNET_HTTP_SOURCE_DIR` for another source path. This runs six wrapper tests
+and three native HTTP sample tests, packages Avro independently, and verifies local
+NuGet publication. The HTTP provider uses an ephemeral port. Normal CI excludes
+this local-only entry until its public API is available upstream; prototype matrix
+discovery can be enabled with `INCLUDE_LOCAL_EXTENSIONS=true` when supplying that
+checkout. There are four routing checks including this opt-in behavior.
+
 ## CI With Act
 
 Install [act](https://github.com/nektos/act) and start Docker. Run from the
@@ -44,7 +64,7 @@ avoids act selecting a VPN interface. Port 34567 must be free. Binding to
 network. Act stops it when the run exits. On Linux, use a host address reachable
 from your chosen Docker network rather than copying the Docker Desktop URL.
 
-The workflow bootstraps PactNet, installs the protobuf plugin, runs the wrapper
+The workflow bootstraps PactNet, installs the selected plugin, runs the wrapper
 and sample tests, packs the wrapper, validates local publication, and uploads its
 package artifacts. Both `discover` and `test` must finish successfully. No NuGet
 credentials or remote publication are involved.
