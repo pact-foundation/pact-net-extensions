@@ -21,7 +21,7 @@ namespace GrpcGreeterClient.Tests
         {
             var config = new PactConfig
             {
-                PactDir = "../../../../pacts/",
+                PactDir = "../../../../../../artifacts/pacts/",
                 Outputters = new[]
                 {
                     new XunitOutput(output)
@@ -35,7 +35,7 @@ namespace GrpcGreeterClient.Tests
                 LogLevel = PactLogLevel.Information
             };
 
-            this.pact = Pact.V4("grpc-greeter-client", "grpc-greeter", config).WithGrpcInteractions();
+            this.pact = Pact.V4("grpc-greeter-client", "grpc-greeter", config).WithGrpcInteractions(pluginVersion: "0.8.0");
         }
 
         [Fact]

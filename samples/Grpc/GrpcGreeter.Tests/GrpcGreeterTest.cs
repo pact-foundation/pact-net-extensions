@@ -23,8 +23,9 @@ namespace GrpcGreeter.Tests
             }
         });
 
-        private readonly string pactPath = Path.Combine("..", "..", "..", "..", "..", "Grpc", "pacts",
-            "grpc-greeter-client-grpc-greeter.json");
+        private readonly string pactPath = Environment.GetEnvironmentVariable("PACT_GRPC_PACT_FILE")
+            ?? Path.Combine("..", "..", "..", "..", "..", "Grpc", "pacts",
+                "grpc-greeter-client-grpc-greeter.json");
 
         [Fact]
         public void VerificationThrowsExceptionWhenNoRunningProvider()
