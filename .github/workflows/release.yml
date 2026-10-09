@@ -1,0 +1,52 @@
+name: Release Extension
+on:
+  push:
+    tags: ['**/v*']
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    outputs:
+      slug: ${{ steps.plan.outputs.slug }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: bash scripts/test-release.sh
+      - id: plan
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: bash scripts/release.sh plan "$RELEASE_TAG" --github-output
+      - run: sudo -n apt-get update && sudo -n apt-get install -y protobuf-compiler
+      - run: bash scripts/bootstrap-pactnet.sh
+      - if: steps.plan.outputs.install != ''
+        env:
+          INSTALL_SCRIPT: ${{ steps.plan.outputs.install }}
+        run: bash "$INSTALL_SCRIPT"
+      - env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: bash scripts/release.sh pack "$RELEASE_TAG"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-${{ steps.plan.outputs.slug }}
+          path: artifacts/release/${{ steps.plan.outputs.slug }}/
+  publish:
+    needs: pack
+    runs-on: ubuntu-latest
+    environment: nuget
+    steps:
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          name: nuget-${{ needs.pack.outputs.slug }}
+          path: packages
+      - env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push 'packages/*.nupkg' --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"

@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "grpc",
+    "package": "PactNet.Extensions.Grpc",
+    "project": "src/PactNet.Extensions.Grpc/PactNet.Extensions.Grpc.csproj",
+    "tests": [
+      "tests/PactNet.Extensions.Grpc.Tests/PactNet.Extensions.Grpc.Tests.csproj",
+      "samples/Grpc/GrpcGreeterClient.Tests/GrpcGreeterClient.Tests.csproj",
+      "samples/Grpc/GrpcGreeter.Tests/GrpcGreeter.Tests.csproj"
+    ],
+    "installPlugin": "scripts/install-grpc-plugin.sh",
+    "environment": {
+      "PACT_GRPC_PACT_FILE": "artifacts/pacts/grpc-greeter-client-grpc-greeter.json"
+    }
+  }
+]

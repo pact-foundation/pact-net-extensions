@@ -1,0 +1,51 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.extensions.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: bash scripts/test-release.sh
+      - id: extensions
+        run: bash scripts/release.sh list --github-output
+  test:
+    needs: discover
+    strategy:
+      fail-fast: false
+      matrix:
+        extension: ${{ fromJson(needs.discover.outputs.matrix).include }}
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - if: runner.os == 'Linux'
+        run: sudo -n apt-get update && sudo -n apt-get install -y protobuf-compiler
+      - run: bash scripts/bootstrap-pactnet.sh
+      - if: matrix.extension.installPlugin != ''
+        env:
+          INSTALL_SCRIPT: ${{ matrix.extension.installPlugin }}
+        run: bash "$INSTALL_SCRIPT"
+      - env:
+          EXTENSION: ${{ matrix.extension.slug }}
+        run: bash scripts/release.sh pack-local "$EXTENSION"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.extension.slug }}-${{ matrix.os }}
+          path: artifacts/release/${{ matrix.extension.slug }}/
