@@ -1,0 +1,99 @@
+# PactNet Plugin Interaction Contributions
+
+## Existing API Boundary
+
+PactNet #551 exposes synchronous-message plugin interactions. gRPC is a transport
+plugin, so its request/response contents work through that public API. The Avro
+plugin is a content matcher: it does not provide an Avro mock-server transport.
+
+The referenced Avro example creates an **HTTP** interaction, loads the plugin,
+and configures `avro/binary` on the response through FFI interaction contents.
+Ordinary PactNet HTTP `WithBody` calls set literal bodies; they do not perform
+plugin configuration. Treating the schema dictionary as an ordinary HTTP body
+or a synchronous message does not reproduce this example.
+
+## HTTP Content Plugin Contribution
+
+A local contribution is prepared in the `pact-net-http-plugins` worktree of the
+PactNet repository, based directly on the same #551 commit used for gRPC:
+`8b6d35e46998aa3b4b583968942d22f258ce8217`. The original PactNet checkout and its
+current work remain unchanged. This API is a prototype, not a published dependency.
+
+The proposed public surface is:
+
+- `IPactV4.WithHttpPluginInteractions(pluginName, pluginVersion, port, host)`.
+- `IHttpPluginPactBuilderV4` with interaction creation, verification and disposal.
+- Request methods for provider states, HTTP method/path, headers, query parameters,
+  and single-shot plugin request contents.
+- A response stage for status/headers and terminal, single-shot plugin contents.
+
+```csharp
+using var pact = Pact.V4("consumer", "provider", config)
+    .WithHttpPluginInteractions("avro", "0.1.3");
+
+pact.UponReceiving("an Avro response")
+    .WithRequest(HttpMethod.Get, "/avro")
+    .WillRespondWithStatus(200)
+    .WithHeader("Content-Type", "avro/binary;record=User")
+    .WithContent("avro/binary", new Dictionary<string, object>
+    {
+        ["pact:avro"] = schemaPath,
+        ["pact:record-name"] = "User",
+        ["id"] = "matching(integer, 1)",
+        ["username"] = "matching(equalTo, 'alice')"
+    });
+```
+
+Internally, it reuses `PactDriver.NewPluginPact` for loading, creates a normal HTTP
+interaction, and composes the existing HTTP/plugin interaction drivers. Shared
+plugin contents handling accepts an interaction part so request and response are
+configured separately. No native handle or internal driver becomes public.
+`AbstractPactBuilder` still owns server startup, mismatch checking, log output and
+pact writing; the plugin driver owns disposal. Synchronous plugin behavior stays
+unchanged.
+
+The contribution includes tests for the correct content part, repeated contents,
+invalid ordering/status, headers/query indexes, HTTP interaction creation and
+disposal. The external Avro sample provides native round-trip and provider/mismatch
+coverage. Before submitting upstream, review null/error paths and failed-content
+state handling, mixed ordinary/plugin HTTP contents, multiple-plugin loading, and
+whether the new surface should compose existing HTTP builders rather than define
+separate stages. Validate all supported platforms, not only the local macOS run.
+
+## Build The Prototype
+
+```shell
+PACTNET_HTTP_SOURCE_DIR=../pact-net-http-plugins \
+  bash scripts/bootstrap-http-plugin.sh
+bash scripts/install-avro-plugin.sh
+bash scripts/release.sh pack-local avro
+bash scripts/test-publish.sh avro
+```
+
+The source checkout must contain the HTTP contribution and descend from the pinned
+#551 commit. Packages use `5.0.0-plugin.messages.1.local`, separate from the gRPC bootstrap.
+No patch files, native driver implementation, or source copies are carried in the
+extension repository. The contribution is in PactNet itself.
+
+The CI bootstrap clones `https://github.com/YOU54F/pact-net.git` into ignored
+`artifacts/` when `PACTNET_HTTP_SOURCE_DIR` is not set. It selects the matching
+`bootstrapRef`: `avro-http` for HTTP-only tests, `avro-async` for the async branch,
+and `avro` for the consolidated branch. Local tests can reuse a checkout through
+`PACTNET_HTTP_SOURCE_DIR`. The Avro test entry participates in normal CI discovery;
+the release guard still blocks publication while it depends on a local PactNet API.
+
+Once the generic API is published, update `AvroPactNetVersion`, remove the prototype
+bootstrap entry, and run the full CI/publish gates before releasing `avro/v<version>`.
+
+## Message Interaction Contribution
+
+The same worktree now also exposes asynchronous plugin messages, single-shot
+configuration and binary/metadata consumer callbacks, keeping native reification,
+string ownership, pact writing and plugin cleanup inside PactNet. The native Avro
+example verifies both a real async consumer and a producer via a message adapter.
+
+[The messaging guide](avro-messaging.md) describes this API and its upstream review
+gates. It also records a native synchronous capability probe: Avro 0.1.3 does not
+populate request/response parts with its single-record configuration. Sync messaging
+therefore needs plugin configuration changes and a transport-free binary consumer
+verification API, not just another wrapper method or a pretend broker transport.

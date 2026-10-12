@@ -38,7 +38,10 @@ jobs:
           global-json-file: global.json
       - if: runner.os == 'Linux'
         run: sudo -n apt-get update && sudo -n apt-get install -y protobuf-compiler
-      - run: bash scripts/bootstrap-pactnet.sh
+      - env:
+          BOOTSTRAP_SCRIPT: ${{ matrix.extension.bootstrapScript || 'scripts/bootstrap-pactnet.sh' }}
+          PACTNET_HTTP_REF: ${{ matrix.extension.bootstrapRef || 'avro-http' }}
+        run: bash "$BOOTSTRAP_SCRIPT"
       - if: matrix.extension.installPlugin != ''
         env:
           INSTALL_SCRIPT: ${{ matrix.extension.installPlugin }}
@@ -46,6 +49,12 @@ jobs:
       - env:
           EXTENSION: ${{ matrix.extension.slug }}
         run: bash scripts/release.sh pack-local "$EXTENSION"
+      - if: failure() && matrix.extension.slug == 'avro'
+        uses: actions/upload-artifact@v7
+        with:
+          name: avro-plugin-logs-${{ matrix.os }}
+          path: artifacts/plugin-output/logs/
+          if-no-files-found: warn
       - env:
           EXTENSION: ${{ matrix.extension.slug }}
         run: bash scripts/test-publish.sh "$EXTENSION"

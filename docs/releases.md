@@ -6,10 +6,11 @@ ordered tests, and optional plugin installers. Shared targets contain metadata,
 not a shared version. Native plugin versions are separately selected at runtime.
 
 For gRPC, the release tag is `grpc/v0.1.0-alpha.1`. A future wrapper could use
-`avro/v2.3.4` without changing the gRPC package. Only registered slugs are accepted;
+`avro/v0.1.0-alpha.1` without changing the gRPC package. Only registered slugs are accepted;
 the tag must match the selected project's version exactly. Build metadata in tags
 is intentionally unsupported. Release-routing tests include a second synthetic
-wrapper to check isolation, but no Avro package exists here yet.
+wrapper to check isolation. Avro is registered as a local-only API prototype;
+it is excluded from normal CI discovery until its prerequisite is published.
 
 ## Local Validation
 

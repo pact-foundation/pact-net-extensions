@@ -14,7 +14,7 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)$(MSBuildProjectName)/README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
-  <Target Name="PreventLocalDependencyRelease" BeforeTargets="Pack" Condition="'$(ReleaseBuild)' == 'true' and '$(PactNetVersion)' == '5.0.0-plugin.551.local'">
-    <Error Text="Release blocked: replace PactNetVersion with a published PactNet version containing the API from PR #551 and validate compatibility first." />
+  <Target Name="PreventLocalDependencyRelease" BeforeTargets="Pack" Condition="'$(ReleaseBuild)' == 'true' and $([System.String]::Copy('$(PactNetVersion)').Contains('.local'))">
+    <Error Text="Release blocked: replace the local PactNet dependency with a published compatible version and validate compatibility first." />
   </Target>
 </Project>
