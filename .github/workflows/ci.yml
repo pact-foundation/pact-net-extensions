@@ -50,6 +50,12 @@ jobs:
       - env:
           EXTENSION: ${{ matrix.extension.slug }}
         run: bash scripts/release.sh pack-local "$EXTENSION"
+      - if: failure() && matrix.extension.slug == 'avro'
+        uses: actions/upload-artifact@v7
+        with:
+          name: avro-plugin-logs-${{ matrix.os }}
+          path: artifacts/plugin-output/logs/
+          if-no-files-found: warn
       - env:
           EXTENSION: ${{ matrix.extension.slug }}
         run: bash scripts/test-publish.sh "$EXTENSION"

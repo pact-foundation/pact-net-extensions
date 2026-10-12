@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Linq;
 using PactNet;
 using PactNet.Exceptions;
 using PactNet.Extensions.Avro;
@@ -31,6 +32,29 @@ public class AvroMessageTests(ITestOutputHelper output)
                 ["username"] = "matching(equalTo, 'alice')"
             });
 
+    private void WritePluginLogsOnFailure()
+    {
+        if (Environment.GetEnvironmentVariable("PACT_DUMP_PLUGIN_LOGS") != "1")
+            return;
+
+        string outputDirectory = Environment.GetEnvironmentVariable("PACT_OUTPUT_DIR");
+        string logDirectory = outputDirectory != null
+            ? Path.Combine(outputDirectory, "logs")
+            : Path.Combine(Environment.GetEnvironmentVariable("PACT_PLUGIN_DIR")
+                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".pact", "plugins"), "logs");
+        if (!Directory.Exists(logDirectory))
+        {
+            output.WriteLine($"Avro plugin log directory was not found: {logDirectory}");
+            return;
+        }
+
+        foreach (string logFile in Directory.GetFiles(logDirectory, "pact-plugin-avro-*.log").Order())
+        {
+            output.WriteLine($"Avro plugin log: {logFile}");
+            output.WriteLine(File.ReadAllText(logFile));
+        }
+    }
+
     [Fact]
     public async Task AsyncConsumerAndProvider_VerifyBinaryContentsAndMetadata()
     {
@@ -54,13 +78,19 @@ public class AvroMessageTests(ITestOutputHelper output)
 
         await using var provider = await AvroProvider.StartAsync("alice");
         output.WriteLine($"Verifying Avro message provider at {new Uri(provider.Address, "/messages")}");
-        using (var verifier = new PactVerifier("AvroMessageProvider", new PactVerifierConfig
+        try
         {
-            LogLevel = PactLogLevel.Trace,
-            Outputters = new[] { new XunitOutput(output) }
-        }))
-        {
+            using var verifier = new PactVerifier("AvroMessageProvider", new PactVerifierConfig
+            {
+                LogLevel = PactLogLevel.Debug,
+                Outputters = new[] { new XunitOutput(output) }
+            });
             verifier.WithHttpEndpoint(new Uri(provider.Address, "/messages")).WithFileSource(pactFile).Verify();
+        }
+        catch
+        {
+            this.WritePluginLogsOnFailure();
+            throw;
         }
         await using var mismatch = await AvroProvider.StartAsync("bob");
         using var mismatchVerifier = new PactVerifier("AvroMessageProvider", new PactVerifierConfig

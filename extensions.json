@@ -25,7 +25,9 @@
     "bootstrapScript": "scripts/bootstrap-http-plugin.sh",
     "bootstrapRef": "avro-async",
     "environment": {
-      "RUST_LOG": "trace"
+      "RUST_LOG": "trace",
+      "PACT_DUMP_PLUGIN_LOGS": "1",
+      "PACT_OUTPUT_DIR": "artifacts/plugin-output"
     }
   }
 ]
