@@ -20,9 +20,11 @@ and other development output stay under ignored `artifacts/`.
 
 ## Avro HTTP Prototype
 
-The Avro wrapper needs the local PactNet HTTP plugin contribution described in
-[the contribution guide](http-plugin-contribution.md). With its checkout at the
-sibling `pact-net-http-plugins` path:
+The Avro wrapper uses the PactNet HTTP plugin API from your
+[avro-http branch](https://github.com/YOU54F/pact-net/tree/avro-http), described
+in [the contribution guide](http-plugin-contribution.md). The bootstrap clones
+that public branch into ignored `artifacts/` on clean CI runners. For local work,
+you can reuse the sibling `pact-net-http-plugins` checkout:
 
 ```shell
 bash scripts/bootstrap-http-plugin.sh
@@ -31,12 +33,11 @@ bash scripts/release.sh pack-local avro
 bash scripts/test-publish.sh avro
 ```
 
-Set `PACTNET_HTTP_SOURCE_DIR` for another source path. This runs six wrapper tests
-and three native HTTP sample tests, packages Avro independently, and verifies local
-NuGet publication. The HTTP provider uses an ephemeral port. Normal CI excludes
-this local-only entry until its public API is available upstream; prototype matrix
-discovery can be enabled with `INCLUDE_LOCAL_EXTENSIONS=true` when supplying that
-checkout. There are four routing checks including this opt-in behavior.
+Set `PACTNET_HTTP_SOURCE_DIR` for another local source path. This runs six wrapper
+tests and three native HTTP sample tests, packages Avro independently, and verifies
+local NuGet publication. The HTTP provider uses an ephemeral port. Standard CI
+discovery includes both gRPC and Avro; the Avro package itself remains unreleasable
+until its PactNet API dependency is published.
 
 ## CI With Act
 

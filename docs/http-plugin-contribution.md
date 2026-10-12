@@ -75,16 +75,14 @@ The source checkout must contain the HTTP contribution and descend from the pinn
 No patch files, native driver implementation, or source copies are carried in the
 extension repository. The contribution is in PactNet itself.
 
-`extensions.json` marks Avro `localOnly` because a clean remote CI runner cannot
-fetch this unpublished prerequisite. `INCLUDE_LOCAL_EXTENSIONS=true` opts it into
-matrix discovery only when the contribution checkout is supplied. Its entry chooses
-the HTTP bootstrap and Avro installer. With act, mount that checkout into the job
-container and set `PACTNET_HTTP_SOURCE_DIR` to its container path before opting in.
-The existing release guard rejects this local dependency even when a tag matches.
+The CI bootstrap clones `https://github.com/YOU54F/pact-net.git` branch `avro-http`
+into ignored `artifacts/` when `PACTNET_HTTP_SOURCE_DIR` is not set. Local tests can
+reuse the sibling PactNet contribution checkout. The Avro test entry participates
+in normal CI discovery; the existing release guard still blocks package publication
+while it depends on the local PactNet API version.
 
-Once the generic API is merged and published, update `AvroPactNetVersion` to the
-compatible release, remove `localOnly` and the prototype bootstrap entry, and run
-the full CI/publish gates before releasing `avro/v<version>`.
+Once the generic API is published, update `AvroPactNetVersion`, remove the prototype
+bootstrap entry, and run the full CI/publish gates before releasing `avro/v<version>`.
 
 ## Asynchronous Plugin Messages
 

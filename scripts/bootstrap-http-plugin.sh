@@ -3,11 +3,17 @@ set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"
-source_dir=${PACTNET_HTTP_SOURCE_DIR:-"$root/../pact-net-http-plugins"}
+source_dir=${PACTNET_HTTP_SOURCE_DIR:-"$root/artifacts/pact-net-http-plugins"}
+repository=${PACTNET_HTTP_REPOSITORY:-"https://github.com/YOU54F/pact-net.git"}
+ref=${PACTNET_HTTP_REF:-"avro-http"}
 base=8b6d35e46998aa3b4b583968942d22f258ce8217
 if [[ ! -f "$source_dir/src/PactNet/HttpPluginPactBuilder.cs" ]]; then
-    printf 'Set PACTNET_HTTP_SOURCE_DIR to the PactNet HTTP plugin contribution checkout. See docs/http-plugin-contribution.md.\n' >&2
-    exit 1
+    if [[ -e "$source_dir" ]]; then
+        printf 'PactNet source directory exists but has no HTTP plugin API: %s\n' "$source_dir" >&2
+        exit 1
+    fi
+    mkdir -p "$(dirname "$source_dir")"
+    git clone --filter=blob:none --branch "$ref" --single-branch "$repository" "$source_dir"
 fi
 source_dir=$(cd "$source_dir" && pwd -P)
 git -C "$source_dir" merge-base --is-ancestor "$base" HEAD
