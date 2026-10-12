@@ -34,20 +34,23 @@ public class AvroMessageTests(ITestOutputHelper output)
     [Fact]
     public async Task AsyncConsumerAndProvider_VerifyBinaryContentsAndMetadata()
     {
-        using var pact = CreatePact("AvroMessageConsumer");
-        await Configure(pact).VerifyAsync(message =>
+        FileInfo pactFile;
+        using (var pact = CreatePact("AvroMessageConsumer"))
         {
-            var record = AvroCodec.Decode(message.Contents);
-            Assert.Equal("alice", record["username"]);
-            Assert.Equal(1L, record["id"]);
-            Assert.Equal("avro/binary;record=User", message.ContentType);
-            Assert.Equal("users", ((JsonElement)message.Metadata["topic"]).GetString());
-            return Task.CompletedTask;
-        });
+            await Configure(pact).VerifyAsync(message =>
+            {
+                var record = AvroCodec.Decode(message.Contents);
+                Assert.Equal("alice", record["username"]);
+                Assert.Equal(1L, record["id"]);
+                Assert.Equal("avro/binary;record=User", message.ContentType);
+                Assert.Equal("users", ((JsonElement)message.Metadata["topic"]).GetString());
+                return Task.CompletedTask;
+            });
 
-        var pactFile = new FileInfo(Path.Combine(PactDirectory, "AvroMessageConsumer-AvroMessageProvider.json"));
-        using var document = JsonDocument.Parse(await File.ReadAllTextAsync(pactFile.FullName));
-        Assert.Equal("Asynchronous/Messages", document.RootElement.GetProperty("interactions")[0].GetProperty("type").GetString());
+            pactFile = new FileInfo(Path.Combine(PactDirectory, "AvroMessageConsumer-AvroMessageProvider.json"));
+            using var document = JsonDocument.Parse(await File.ReadAllTextAsync(pactFile.FullName));
+            Assert.Equal("Asynchronous/Messages", document.RootElement.GetProperty("interactions")[0].GetProperty("type").GetString());
+        }
 
         await using var provider = await AvroProvider.StartAsync("alice");
         output.WriteLine($"Verifying Avro message provider at {new Uri(provider.Address, "/messages")}");
