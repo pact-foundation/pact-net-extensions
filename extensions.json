@@ -23,6 +23,6 @@
     ],
     "installPlugin": "scripts/install-avro-plugin.sh",
     "bootstrapScript": "scripts/bootstrap-http-plugin.sh",
-    "bootstrapRef": "avro-http"
+    "bootstrapRef": "avro-async"
   }
 ]
