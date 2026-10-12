@@ -23,6 +23,9 @@
     ],
     "installPlugin": "scripts/install-avro-plugin.sh",
     "bootstrapScript": "scripts/bootstrap-http-plugin.sh",
-    "bootstrapRef": "avro-async"
+    "bootstrapRef": "avro-async",
+    "environment": {
+      "RUST_LOG": "trace"
+    }
   }
 ]
