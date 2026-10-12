@@ -56,7 +56,7 @@ public class AvroMessageTests(ITestOutputHelper output)
         output.WriteLine($"Verifying Avro message provider at {new Uri(provider.Address, "/messages")}");
         using (var verifier = new PactVerifier("AvroMessageProvider", new PactVerifierConfig
         {
-            LogLevel = PactLogLevel.Debug,
+            LogLevel = PactLogLevel.Trace,
             Outputters = new[] { new XunitOutput(output) }
         }))
         {
