@@ -75,11 +75,12 @@ The source checkout must contain the HTTP contribution and descend from the pinn
 No patch files, native driver implementation, or source copies are carried in the
 extension repository. The contribution is in PactNet itself.
 
-The CI bootstrap clones `https://github.com/YOU54F/pact-net.git` branch `avro-http`
-into ignored `artifacts/` when `PACTNET_HTTP_SOURCE_DIR` is not set. Local tests can
-reuse the sibling PactNet contribution checkout. The Avro test entry participates
-in normal CI discovery; the existing release guard still blocks package publication
-while it depends on the local PactNet API version.
+The CI bootstrap clones `https://github.com/YOU54F/pact-net.git` into ignored
+`artifacts/` when `PACTNET_HTTP_SOURCE_DIR` is not set. It selects the matching
+`bootstrapRef`: `avro-http` for HTTP-only tests, `avro-async` for the async branch,
+and `avro` for the consolidated branch. Local tests can reuse a checkout through
+`PACTNET_HTTP_SOURCE_DIR`. The Avro test entry participates in normal CI discovery;
+the release guard still blocks publication while it depends on a local PactNet API.
 
 Once the generic API is published, update `AvroPactNetVersion`, remove the prototype
 bootstrap entry, and run the full CI/publish gates before releasing `avro/v<version>`.

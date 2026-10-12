@@ -20,11 +20,11 @@ and other development output stay under ignored `artifacts/`.
 
 ## Avro HTTP Prototype
 
-The Avro wrapper uses the PactNet HTTP plugin API from your
-[avro-http branch](https://github.com/YOU54F/pact-net/tree/avro-http), described
-in [the contribution guide](http-plugin-contribution.md). The bootstrap clones
-that public branch into ignored `artifacts/` on clean CI runners. For local work,
-you can reuse the sibling `pact-net-http-plugins` checkout:
+The Avro wrapper uses the PactNet plugin API described in
+[the contribution guide](http-plugin-contribution.md). The bootstrap clones the
+matching public PactNet branch into ignored `artifacts/` on clean CI runners:
+`avro-http`, `avro-async` or consolidated `avro`. For local work, override
+`PACTNET_HTTP_SOURCE_DIR` to reuse a sibling checkout:
 
 ```shell
 bash scripts/bootstrap-http-plugin.sh

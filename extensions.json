@@ -22,6 +22,7 @@
       "samples/Avro/AvroSample.Tests/AvroSample.Tests.csproj"
     ],
     "installPlugin": "scripts/install-avro-plugin.sh",
-    "bootstrapScript": "scripts/bootstrap-http-plugin.sh"
+    "bootstrapScript": "scripts/bootstrap-http-plugin.sh",
+    "bootstrapRef": "avro"
   }
 ]

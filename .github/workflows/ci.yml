@@ -40,6 +40,7 @@ jobs:
         run: sudo -n apt-get update && sudo -n apt-get install -y protobuf-compiler
       - env:
           BOOTSTRAP_SCRIPT: ${{ matrix.extension.bootstrapScript || 'scripts/bootstrap-pactnet.sh' }}
+          PACTNET_HTTP_REF: ${{ matrix.extension.bootstrapRef || 'avro-http' }}
         run: bash "$BOOTSTRAP_SCRIPT"
       - if: matrix.extension.installPlugin != ''
         env:
