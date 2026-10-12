@@ -79,6 +79,7 @@ exercise each request rather than relying solely on verification success.
 
 ## Contributing And Releases
 
+- [Developer testing](docs/developer-testing.md): native tests, act, and local NuGet publication.
 - [Wrapper-author workshop](docs/writing-a-wrapper.md): raw API, thin fluent wrapper, tests, and registration.
 - [Independent releases](docs/releases.md): package-specific versions, tags, gates, and adding wrappers.
 

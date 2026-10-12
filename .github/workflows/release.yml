@@ -13,8 +13,8 @@ jobs:
     outputs:
       slug: ${{ steps.plan.outputs.slug }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
       - run: bash scripts/test-release.sh
@@ -31,7 +31,7 @@ jobs:
       - env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: bash scripts/release.sh pack "$RELEASE_TAG"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: nuget-${{ steps.plan.outputs.slug }}
           path: artifacts/release/${{ steps.plan.outputs.slug }}/
@@ -40,10 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: nuget
     steps:
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: nuget-${{ needs.pack.outputs.slug }}
           path: packages

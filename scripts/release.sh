@@ -25,10 +25,16 @@ run_tests() {
     local extension=$1 project name value
     local environment=("PACT_PLUGIN_DIR=$root/artifacts/plugins")
     while IFS=$'\t' read -r name value; do
+        value=${value%$'\r'}
         environment+=("$name=$root/$value")
     done < <(jq -r '.environment // {} | to_entries[] | [.key, .value] | @tsv' <<< "$extension")
     while IFS= read -r project; do
-        env "${environment[@]}" dotnet test "$project" --configuration Release \
+        project=${project%$'\r'}
+        project_path="$root/$project"
+        if command -v cygpath >/dev/null; then
+            project_path=$(cygpath -w "$project_path")
+        fi
+        env "${environment[@]}" dotnet test "$project_path" --configuration Release \
             --framework net8.0 --verbosity minimal
     done < <(jq -r '.tests[]' <<< "$extension")
 }
@@ -76,10 +82,15 @@ main() {
     run_tests "$extension"
     if [[ "$command" == pack || "$command" == pack-local ]]; then
         project=$(jq -r '.project' <<< "$extension")
+        project=${project%$'\r'}
+        project_path="$root/$project"
+        if command -v cygpath >/dev/null; then
+            project_path=$(cygpath -w "$project_path")
+        fi
         slug=$(jq -r '.slug' <<< "$extension")
         local release_build=false
         if [[ "$command" == pack ]]; then release_build=true; fi
-        dotnet pack "$project" --configuration Release --no-build \
+        dotnet pack "$project_path" --configuration Release --no-build \
             --output "$root/artifacts/release/$slug" -p:ReleaseBuild="$release_build"
     fi
 }

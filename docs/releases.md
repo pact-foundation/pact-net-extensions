@@ -23,6 +23,10 @@ These commands do not create tags, commits, releases, or push packages. `pack-lo
 runs only the chosen wrapper's registered tests and creates development packages
 under `artifacts/release/<slug>/`.
 
+Run `bash scripts/test-publish.sh <slug>` to publish those packages to the isolated
+local NuGet registry and verify a fresh consumer restore/build. See
+[developer testing](developer-testing.md) for the act command and registry checks.
+
 Release tooling uses Bash, jq for structured JSON parsing, and dotnet/MSBuild.
 GitHub-hosted runner images provide jq; local Windows users need it on Git Bash's
 PATH. The `list --github-output` and `plan <tag> --github-output` commands write

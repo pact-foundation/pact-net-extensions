@@ -12,8 +12,8 @@ jobs:
     outputs:
       matrix: ${{ steps.extensions.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
       - run: bash scripts/test-release.sh
@@ -21,6 +21,7 @@ jobs:
         run: bash scripts/release.sh list --github-output
   test:
     needs: discover
+    name: test-${{ matrix.extension.slug }}-${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -31,8 +32,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
       - if: runner.os == 'Linux'
@@ -45,7 +46,10 @@ jobs:
       - env:
           EXTENSION: ${{ matrix.extension.slug }}
         run: bash scripts/release.sh pack-local "$EXTENSION"
-      - uses: actions/upload-artifact@v4
+      - env:
+          EXTENSION: ${{ matrix.extension.slug }}
+        run: bash scripts/test-publish.sh "$EXTENSION"
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.extension.slug }}-${{ matrix.os }}
           path: artifacts/release/${{ matrix.extension.slug }}/
