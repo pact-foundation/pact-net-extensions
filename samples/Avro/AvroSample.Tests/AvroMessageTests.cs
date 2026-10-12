@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using PactNet;
 using PactNet.Exceptions;
 using PactNet.Extensions.Avro;
+using PactNet.Output.Xunit;
 using PactNet.Verifier;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace AvroSample.Tests;
 
-public class AvroMessageTests
+public class AvroMessageTests(ITestOutputHelper output)
 {
     private static string PactDirectory => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,
         "../../../../../../artifacts/avro-message-pacts"));
@@ -48,12 +50,21 @@ public class AvroMessageTests
         Assert.Equal("Asynchronous/Messages", document.RootElement.GetProperty("interactions")[0].GetProperty("type").GetString());
 
         await using var provider = await AvroProvider.StartAsync("alice");
-        using (var verifier = new PactVerifier("AvroMessageProvider", new PactVerifierConfig()))
+        output.WriteLine($"Verifying Avro message provider at {new Uri(provider.Address, "/messages")}");
+        using (var verifier = new PactVerifier("AvroMessageProvider", new PactVerifierConfig
+        {
+            LogLevel = PactLogLevel.Debug,
+            Outputters = new[] { new XunitOutput(output) }
+        }))
         {
             verifier.WithHttpEndpoint(new Uri(provider.Address, "/messages")).WithFileSource(pactFile).Verify();
         }
         await using var mismatch = await AvroProvider.StartAsync("bob");
-        using var mismatchVerifier = new PactVerifier("AvroMessageProvider", new PactVerifierConfig());
+        using var mismatchVerifier = new PactVerifier("AvroMessageProvider", new PactVerifierConfig
+        {
+            LogLevel = PactLogLevel.Debug,
+            Outputters = new[] { new XunitOutput(output) }
+        });
         Assert.Throws<PactVerificationFailedException>(() => mismatchVerifier
             .WithHttpEndpoint(new Uri(mismatch.Address, "/messages")).WithFileSource(pactFile).Verify());
     }
