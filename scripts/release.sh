@@ -45,7 +45,8 @@ main() {
     registry=$(jq -c . extensions.json)
     case "$command" in
         list)
-            matrix=$(jq -c '{include: .}' <<< "$registry")
+            matrix=$(jq -c --argjson includeLocal "${INCLUDE_LOCAL_EXTENSIONS:-false}" \
+                '{include: [.[] | select(.localOnly != true or $includeLocal)]}' <<< "$registry")
             printf '%s\n' "$matrix"
             if [[ "$target" == --github-output ]]; then
                 printf 'matrix=%s\n' "$matrix" >> "${GITHUB_OUTPUT:?GITHUB_OUTPUT is required}"

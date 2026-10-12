@@ -38,7 +38,9 @@ jobs:
           global-json-file: global.json
       - if: runner.os == 'Linux'
         run: sudo -n apt-get update && sudo -n apt-get install -y protobuf-compiler
-      - run: bash scripts/bootstrap-pactnet.sh
+      - env:
+          BOOTSTRAP_SCRIPT: ${{ matrix.extension.bootstrapScript || 'scripts/bootstrap-pactnet.sh' }}
+        run: bash "$BOOTSTRAP_SCRIPT"
       - if: matrix.extension.installPlugin != ''
         env:
           INSTALL_SCRIPT: ${{ matrix.extension.installPlugin }}

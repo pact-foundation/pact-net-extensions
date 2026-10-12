@@ -1,8 +1,9 @@
 # PactNet Extensions
 
 Independently versioned .NET wrappers for the [Pact plugin framework](https://github.com/pact-foundation/pact-plugins).
-The first wrapper is `PactNet.Extensions.Grpc`, for unary gRPC consumer contract tests
-using the protobuf plugin. This repository contains wrappers, not plugin drivers
+The gRPC wrapper supports unary consumer contract tests using the protobuf plugin.
+An Avro HTTP content wrapper and sample use a local PactNet API contribution.
+This repository contains wrappers, not plugin drivers
 or native plugins. PactNet owns mock servers, verification, logging, pact writing,
 and native resource cleanup.
 
@@ -80,6 +81,8 @@ exercise each request rather than relying solely on verification success.
 ## Contributing And Releases
 
 - [Developer testing](docs/developer-testing.md): native tests, act, and local NuGet publication.
+- [Avro example](samples/Avro/README.md): binary HTTP contracts with the hominux plugin.
+- [Plugin interaction contributions](docs/http-plugin-contribution.md): public HTTP hooks and the separate async-message prerequisite.
 - [Wrapper-author workshop](docs/writing-a-wrapper.md): raw API, thin fluent wrapper, tests, and registration.
 - [Independent releases](docs/releases.md): package-specific versions, tags, gates, and adding wrappers.
 

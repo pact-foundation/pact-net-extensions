@@ -24,3 +24,7 @@ if bash "$root/scripts/release.sh" plan grpc/v9.9.9 >/dev/null 2>&1; then
     exit 1
 fi
 printf 'PASS: tag must match the project version\n'
+
+matrix=$(bash "$root/scripts/release.sh" list)
+jq -e '[.include[].slug] == ["grpc", "avro"]' <<< "$matrix" >/dev/null
+printf 'PASS: gRPC and Avro are included in CI discovery\n'

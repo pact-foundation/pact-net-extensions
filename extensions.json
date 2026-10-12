@@ -12,5 +12,16 @@
     "environment": {
       "PACT_GRPC_PACT_FILE": "artifacts/pacts/grpc-greeter-client-grpc-greeter.json"
     }
+  },
+  {
+    "slug": "avro",
+    "package": "PactNet.Extensions.Avro",
+    "project": "src/PactNet.Extensions.Avro/PactNet.Extensions.Avro.csproj",
+    "tests": [
+      "tests/PactNet.Extensions.Avro.Tests/PactNet.Extensions.Avro.Tests.csproj",
+      "samples/Avro/AvroSample.Tests/AvroSample.Tests.csproj"
+    ],
+    "installPlugin": "scripts/install-avro-plugin.sh",
+    "bootstrapScript": "scripts/bootstrap-http-plugin.sh"
   }
 ]
