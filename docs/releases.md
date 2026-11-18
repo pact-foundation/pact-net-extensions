@@ -46,8 +46,8 @@ runtime or generated plan file. Scripts are checked out with LF line endings.
    targets in the imported unit project are not run by this matrix.
 5. Set the selected wrapper's version, update its README, run its tests and local
    pack, and verify package dependencies. Keep sibling versions unchanged.
-6. Configure the GitHub `nuget` environment with required reviewer approval and a
-   `NUGET_API_KEY` environment secret. Restrict release tags using repository rules.
+6. Configure publishing (one-off, see [NuGet publishing](#nuget-publishing)).
+   Restrict release tags using repository rules.
 7. Only after approval, create and push the wrapper-specific tag.
 
 The release workflow checks the tag, runs the selected wrapper's tests, and packs
@@ -59,3 +59,29 @@ packages; NuGet's push command discovers the adjacent symbols package.
 
 Adding another wrapper means adding its projects, README, tests/sample and registry
 entry, not adding a second global version or copying the release workflow.
+
+## NuGet Publishing
+
+Packages are published to nuget.org with
+[Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing):
+the `publish` job exchanges GitHub's OIDC token for a short-lived API key via
+`NuGet/login`. There is no long-lived `NUGET_API_KEY` secret.
+
+The `PactNet` ID prefix is reserved on nuget.org by the `pact-foundation`
+organisation, so new `PactNet.Extensions.*` IDs can only be pushed on behalf of
+that organisation. Pushing from any other account is rejected. The one-off setup
+is therefore done by a `pact-foundation` org admin:
+
+1. On nuget.org, open **Trusted Publishing** and add a GitHub Actions policy
+   owned by the `pact-foundation` organisation:
+   - Repository owner: `pact-foundation`
+   - Repository: `pact-net-extensions`
+   - Workflow file: `release.yml`
+   - Environment: `nuget`
+2. In this repository, create the `nuget` environment with required reviewers and
+   a deployment rule limited to release tags (`*/v*`).
+3. Add the repository (or environment) variable `NUGET_USER`: the nuget.org
+   profile name (not email) of the `pact-foundation` member who created the policy.
+
+The policy is temporarily active until its first successful use binds it to this
+repository, so run the first release soon after creating it.
